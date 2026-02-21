@@ -1,1 +1,129 @@
-<p>customer-detail works!</p>
+<div class="detail-container">
+
+    <!-- Back button -->
+    <button mat-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Customers
+    </button>
+
+    <!-- Loading -->
+    @if (loading) {
+    <div class="spinner-container">
+        <mat-spinner diameter="48" />
+    </div>
+    }
+
+    <!-- Error -->
+    @if (error) {
+    <mat-card class="error-card">
+        <mat-card-content>
+            <mat-icon>error_outline</mat-icon>
+            <p>{{ error }}</p>
+        </mat-card-content>
+    </mat-card>
+    }
+
+    <!-- Content -->
+    @if (!loading && !error && customer) {
+
+    <!-- Header -->
+    <div class="page-header">
+        <h1>{{ customer.firstName }} {{ customer.lastName }}</h1>
+        <div class="header-actions">
+            <button mat-stroked-button color="primary" (click)="edit()">
+                <mat-icon>edit</mat-icon>
+                Edit
+            </button>
+            <button mat-stroked-button color="warn" (click)="delete()">
+                <mat-icon>delete</mat-icon>
+                Delete
+            </button>
+        </div>
+    </div>
+
+    <!-- Customer info -->
+    <mat-card class="info-card" elevation="2">
+        <mat-card-header>
+            <mat-card-title>Customer Information</mat-card-title>
+            <mat-card-subtitle>ID: {{ customer.customerId }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">{{ customer.email }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Mobile</span>
+                    <span class="info-value">{{ customer.mobileNumber }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Member Since</span>
+                    <span class="info-value">{{ customer.createdAt | date:'medium' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Last Modified</span>
+                    <span class="info-value">{{ customer.updatedAt | date:'medium' }}</span>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Accounts -->
+    <mat-card class="accounts-card" elevation="2">
+        <mat-card-header>
+            <mat-card-title>Accounts ({{ customer.accounts.length }})</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            @if (customer.accounts.length === 0) {
+            <p class="no-data">No accounts found for this customer.</p>
+            } @else {
+            <table mat-table [dataSource]="customer.accounts" class="accounts-table">
+
+                <ng-container matColumnDef="accountNumber">
+                    <th mat-header-cell *matHeaderCellDef>Account Number</th>
+                    <td mat-cell *matCellDef="let a">{{ a.accountNumber }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="balance">
+                    <th mat-header-cell *matHeaderCellDef>Balance</th>
+                    <td mat-cell *matCellDef="let a">{{ a.balance | currency:'ZAR':'symbol-narrow' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="isMainAccount">
+                    <th mat-header-cell *matHeaderCellDef>Type</th>
+                    <td mat-cell *matCellDef="let a">
+                        @if (a.isMainAccount) {
+                        <span class="badge-main">Main</span>
+                        } @else {
+                        <span class="badge-secondary">Secondary</span>
+                        }
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="createdAt">
+                    <th mat-header-cell *matHeaderCellDef>Created</th>
+                    <td mat-cell *matCellDef="let a">{{ a.createdAt | date:'medium' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let a">
+                        <button mat-icon-button color="primary" [matTooltip]="'View payments'"
+                            (click)="goToPayments(a.accountNumber)">
+                            <mat-icon>receipt_long</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="accountColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: accountColumns"></tr>
+
+            </table>
+            }
+        </mat-card-content>
+    </mat-card>
+
+    }
+
+</div>

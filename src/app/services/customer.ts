@@ -18,6 +18,7 @@ export interface CustomerDetailed {
   email: string;
   mobileNumber: string;
   createdAt: string;
+  updatedAt: string;
   accounts: Account[];
 }
 
