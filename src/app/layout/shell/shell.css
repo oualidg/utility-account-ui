@@ -66,3 +66,16 @@
   padding: 24px;
   flex: 1;
 }
+
+.shell-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px;
+  font-size: 18px;
+  font-weight: 500;
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 8px;
+  cursor: pointer;
+}

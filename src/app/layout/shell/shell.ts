@@ -22,7 +22,6 @@ import { MatIconModule } from '@angular/material/icon';
 export class ShellComponent {
 
   navItems = [
-    { label: 'Home',      icon: 'home',        route: '/home' },
     { label: 'Dashboard', icon: 'dashboard',   route: '/dashboard' },
     { label: 'Customers', icon: 'people',      route: '/customers' },
     { label: 'Providers', icon: 'business',    route: '/providers' },
