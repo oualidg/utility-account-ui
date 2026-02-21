@@ -57,9 +57,12 @@ export class CustomerDetailComponent implements OnInit {
     });
   }
 
-  goToPayments(accountNumber: number): void {
-    this.router.navigate(['/customers', this.customer?.customerId, 'accounts', accountNumber]);
-  }
+goToPayments(account: Account): void {
+  this.router.navigate(
+    ['/customers', this.customer?.customerId, 'accounts', account.accountNumber],
+    { state: { account } }
+  );
+}
 
   goBack(): void {
     this.router.navigate(['/customers']);

@@ -1,1 +1,105 @@
-<p>account-payments works!</p>
+<div class="payments-container">
+
+  <!-- Back button -->
+  <button mat-button (click)="goBack()" class="back-button">
+    <mat-icon>arrow_back</mat-icon>
+    Back to Customer
+  </button>
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Account {{ account?.accountNumber }}</h1>
+  </div>
+
+  <!-- Account info -->
+  @if (account) {
+    <mat-card class="info-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Account Information</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Balance</span>
+            <span class="info-value">{{ account.balance | currency:'ZAR':'symbol-narrow' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Type</span>
+            <span class="info-value">
+              @if (account.isMainAccount) {
+                <span class="badge-main">Main</span>
+              } @else {
+                <span class="badge-secondary">Secondary</span>
+              }
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Created</span>
+            <span class="info-value">{{ account.createdAt | date:'medium' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="spinner-container">
+      <mat-spinner diameter="48" />
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ error }}</p>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Payments -->
+  @if (!loading && !error) {
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Payments ({{ payments.length }})</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (payments.length === 0) {
+          <p class="no-data">No payments found for this account.</p>
+        } @else {
+          <table mat-table [dataSource]="payments" class="payments-table">
+
+            <ng-container matColumnDef="receiptNumber">
+              <th mat-header-cell *matHeaderCellDef>Receipt</th>
+              <td mat-cell *matCellDef="let p">{{ p.receiptNumber }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell *matHeaderCellDef>Amount</th>
+              <td mat-cell *matCellDef="let p">
+                {{ p.amount | currency:'ZAR':'symbol-narrow' }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="paymentDate">
+              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <td mat-cell *matCellDef="let p">{{ p.paymentDate | date:'medium' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="providerCode">
+              <th mat-header-cell *matHeaderCellDef>Provider</th>
+              <td mat-cell *matCellDef="let p">{{ p.providerCode }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="paymentColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: paymentColumns"></tr>
+
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+
+</div>

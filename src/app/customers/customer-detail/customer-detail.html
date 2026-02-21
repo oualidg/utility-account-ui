@@ -110,7 +110,7 @@
                     <th mat-header-cell *matHeaderCellDef></th>
                     <td mat-cell *matCellDef="let a">
                         <button mat-icon-button color="primary" [matTooltip]="'View payments'"
-                            (click)="goToPayments(a.accountNumber)">
+                            (click)="goToPayments(a)">
                             <mat-icon>receipt_long</mat-icon>
                         </button>
                     </td>
