@@ -1,1 +1,28 @@
-<p>shell works!</p>
+<mat-sidenav-container class="shell-container">
+
+  <mat-sidenav mode="side" opened class="shell-sidenav">
+    <div class="shell-logo">
+      <mat-icon>bolt</mat-icon>
+      <span>Utility Account</span>
+    </div>
+    <mat-nav-list>
+      @for (item of navItems; track item.route) {
+        <a mat-list-item
+           [routerLink]="item.route"
+           routerLinkActive="active-link">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="shell-content">
+    <mat-toolbar color="primary" class="shell-toolbar">
+    </mat-toolbar>
+    <div class="shell-page">
+      <router-outlet />
+    </div>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>
