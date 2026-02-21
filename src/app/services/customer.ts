@@ -1,31 +1,26 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-// Mirrors your Spring Boot CustomerSummaryResponse DTO
 export interface CustomerSummary {
   customerId: number;
   firstName: string;
   lastName: string;
   email: string;
   mobileNumber: string;
-  active: boolean;
 }
 
-// Mirrors your Spring Boot CustomerDetailedResponse DTO
 export interface CustomerDetailed {
   customerId: number;
   firstName: string;
   lastName: string;
   email: string;
   mobileNumber: string;
-  active: boolean;
   createdAt: string;
   accounts: Account[];
 }
 
-// Mirrors your Spring Boot AccountResponse DTO
 export interface Account {
   accountNumber: number;
   balance: number;
@@ -49,4 +44,13 @@ export class CustomerService {
   getById(id: number): Observable<CustomerDetailed> {
     return this.http.get<CustomerDetailed>(`${this.baseUrl}/${id}`);
   }
+
+searchByMobile(mobile: string): Observable<CustomerSummary[]> {
+  return this.http.get<CustomerSummary[]>(`${this.baseUrl}/search`, {
+    params: new HttpParams().set('mobile', mobile)
+  });
+}
+
+
+
 }
