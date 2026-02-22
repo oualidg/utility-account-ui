@@ -29,6 +29,20 @@ export interface Account {
   createdAt: string;
 }
 
+export interface CreateCustomerRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobileNumber: string;
+}
+
+export interface UpdateCustomerRequest {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  mobileNumber?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -36,7 +50,7 @@ export class CustomerService {
 
   private readonly baseUrl = `${environment.apiBaseUrl}/api/v1/customers`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<CustomerSummary[]> {
     return this.http.get<CustomerSummary[]>(this.baseUrl);
@@ -46,11 +60,23 @@ export class CustomerService {
     return this.http.get<CustomerDetailed>(`${this.baseUrl}/${id}`);
   }
 
-searchByMobile(mobile: string): Observable<CustomerSummary[]> {
-  return this.http.get<CustomerSummary[]>(`${this.baseUrl}/search`, {
-    params: new HttpParams().set('mobile', mobile)
-  });
-}
+  searchByMobile(mobile: string): Observable<CustomerSummary[]> {
+    return this.http.get<CustomerSummary[]>(`${this.baseUrl}/search`, {
+      params: new HttpParams().set('mobile', mobile)
+    });
+  }
+
+  create(request: CreateCustomerRequest): Observable<CustomerDetailed> {
+    return this.http.post<CustomerDetailed>(`${this.baseUrl}`, request);
+  }
+
+  update(id: number, request: UpdateCustomerRequest): Observable<CustomerDetailed> {
+    return this.http.put<CustomerDetailed>(`${this.baseUrl}/${id}`, request);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 
 
 

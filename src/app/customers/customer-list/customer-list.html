@@ -2,7 +2,7 @@
 
     <div class="page-header">
         <h1>Customers</h1>
-        <button mat-raised-button color="primary" (click)="onboard()">
+        <button mat-raised-button class="onboard-button" (click)="onboard()">
             <mat-icon>person_add</mat-icon>
             Onboard
         </button>
@@ -100,16 +100,16 @@
                 </ng-container>
 
                 <ng-container matColumnDef="action">
-  <th mat-header-cell *matHeaderCellDef></th>
-  <td mat-cell *matCellDef="let c">
-    <button mat-icon-button color="primary" (click)="goToCustomer(c.customerId)">
-      <mat-icon>arrow_forward</mat-icon>
-    </button>
-  </td>
-</ng-container>
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let c">
+                        <button mat-icon-button color="primary" (click)="goToCustomer(c.customerId)">
+                            <mat-icon>arrow_forward</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
 
-<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-<tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
             </table>
         </mat-card-content>

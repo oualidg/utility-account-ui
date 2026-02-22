@@ -1,0 +1,9 @@
+.full-width {
+  width: 100%;
+}
+
+.field-error {
+  margin: 0 0 8px 16px;
+  font-size: 12px;
+  color: #c62828;
+}

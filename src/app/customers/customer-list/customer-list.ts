@@ -10,6 +10,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CustomerService, CustomerSummary } from '../../services/customer';
+import { OnboardCustomerDialogComponent } from '../onboard-customer-dialog/onboard-customer-dialog';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-customer-list',
@@ -22,7 +24,8 @@ import { CustomerService, CustomerSummary } from '../../services/customer';
     MatInputModule,
     MatSelectModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDialogModule
   ],
   templateUrl: './customer-list.html',
   styleUrl: './customer-list.css'
@@ -41,13 +44,14 @@ export class CustomerListComponent implements OnInit {
   searching = false;
   searchError = '';
 
-displayedColumns = ['customerId', 'firstName', 'lastName', 'email', 'mobileNumber', 'action'];
+  displayedColumns = ['customerId', 'firstName', 'lastName', 'email', 'mobileNumber', 'action'];
 
   constructor(
     private customerService: CustomerService,
     private router: Router,
+    private dialog: MatDialog,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.customerService.getAll().subscribe({
@@ -77,11 +81,11 @@ displayedColumns = ['customerId', 'firstName', 'lastName', 'email', 'mobileNumbe
           this.searching = false;
           this.router.navigate(['/customers', customer.customerId]);
         },
-error: (err) => {
-  this.searching = false;
-  this.searchError = err.error?.message || 'Something went wrong';
-  this.cdr.detectChanges();
-}
+        error: (err) => {
+          this.searching = false;
+          this.searchError = err.error?.message || 'Something went wrong';
+          this.cdr.detectChanges();
+        }
       });
 
     } else if (this.searchType === 'Mobile') {
@@ -91,11 +95,11 @@ error: (err) => {
           this.searching = false;
           this.cdr.detectChanges();
         },
-error: (err) => {
-  this.searching = false;
-  this.searchError = err.error?.message || 'Something went wrong';
-  this.cdr.detectChanges();
-}
+        error: (err) => {
+          this.searching = false;
+          this.searchError = err.error?.message || 'Something went wrong';
+          this.cdr.detectChanges();
+        }
       });
     }
   }
@@ -111,7 +115,14 @@ error: (err) => {
   }
 
   onboard(): void {
-    // TODO: open onboard dialog
-    console.log('onboard clicked');
+    const dialogRef = this.dialog.open(OnboardCustomerDialogComponent, {
+      width: '480px'
+    });
+
+    dialogRef.afterClosed().subscribe(customer => {
+      if (customer) {
+        this.ngOnInit();
+      }
+    });
   }
 }

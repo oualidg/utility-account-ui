@@ -50,22 +50,12 @@
     <div class="summary-cards">
         <mat-card class="summary-card" appearance="outlined">
             <mat-card-content>
-                <div class="summary-icon-row">
+                <div class="summary-row">
                     <mat-icon class="summary-icon">payments</mat-icon>
-                </div>
-                <div class="summary-label">Total Payments</div>
-                <div class="summary-value">{{ summary.totalCount }}</div>
-            </mat-card-content>
-        </mat-card>
-
-        <mat-card class="summary-card" appearance="outlined">
-            <mat-card-content>
-                <div class="summary-icon-row">
-                    <mat-icon class="summary-icon">account_balance</mat-icon>
-                </div>
-                <div class="summary-label">Total Amount</div>
-                <div class="summary-value">
-                    {{ summary.totalAmount | currency:'ZAR':'symbol-narrow' }}
+                    <div>
+                        <div class="summary-label">Total Payments</div>
+                        <div class="summary-value">{{ summary.totalCount }}</div>
+                    </div>
                 </div>
             </mat-card-content>
         </mat-card>
@@ -73,10 +63,22 @@
         <mat-card class="summary-card" appearance="outlined">
             <mat-card-content>
                 <div class="summary-row">
-                    <mat-icon class="summary-icon">payments</mat-icon>
+                    <mat-icon class="summary-icon">account_balance</mat-icon>
                     <div>
-                        <div class="summary-label">Total Transactions</div>
-                        <div class="summary-value">2</div>
+                        <div class="summary-label">Total Amount</div>
+                        <div class="summary-value">{{ summary.totalAmount | currency:'ZAR':'symbol-narrow' }}</div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="summary-card" appearance="outlined">
+            <mat-card-content>
+                <div class="summary-row">
+                    <mat-icon class="summary-icon">business</mat-icon>
+                    <div>
+                        <div class="summary-label">Active Providers</div>
+                        <div class="summary-value">{{ summary.byProvider.length }}</div>
                     </div>
                 </div>
             </mat-card-content>
