@@ -13,3 +13,9 @@ html {
     density: 0
   ));
 }
+
+.mat-mdc-tooltip .mdc-tooltip__surface {
+  background-color: #1a237e !important;
+  color: white !important;
+  font-size: 12px !important;
+}

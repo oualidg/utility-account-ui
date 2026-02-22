@@ -26,6 +26,14 @@ export interface PaymentRecord {
   customerId: number;
 }
 
+export interface ProviderReconciliation {
+  providerCode: string;
+  providerName: string;
+  totalAmount: number;
+  totalCount: number;
+  payments: PaymentRecord[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -47,5 +55,21 @@ export class ReportService {
     if (from) params = params.set('from', from);
     if (to) params = params.set('to', to);
     return this.http.get<PaymentRecord[]>(`${this.baseUrl}/payments`, { params });
+  }
+
+  getPaymentsByProvider(providerCode: string, from?: string, to?: string): Observable<PaymentRecord[]> {
+    let params = new HttpParams().set('providerCode', providerCode);
+    if (from) params = params.set('from', from);
+    if (to) params = params.set('to', to);
+    return this.http.get<PaymentRecord[]>(`${this.baseUrl}/payments`, { params });
+  }
+
+  getReconciliation(providerCode: string, from?: string, to?: string): Observable<ProviderReconciliation> {
+    let params = new HttpParams();
+    if (from) params = params.set('from', from);
+    if (to) params = params.set('to', to);
+    return this.http.get<ProviderReconciliation>(
+      `${this.baseUrl}/providers/${providerCode}/reconciliation`, { params }
+    );
   }
 }

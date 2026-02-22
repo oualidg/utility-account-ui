@@ -34,6 +34,10 @@ export const routes: Routes = [
         path: 'providers',
         loadComponent: () => import('./providers/providers').then(m => m.ProvidersComponent)
       },
+      {
+        path: 'providers/:id',
+        loadComponent: () => import('./providers/provider-detail/provider-detail').then(m => m.ProviderDetailComponent)
+      },
     ]
   },
   {

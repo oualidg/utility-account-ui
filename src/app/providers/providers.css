@@ -1,0 +1,80 @@
+.providers-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 500;
+  color: #1a237e;
+  margin: 0;
+}
+
+.onboard-button {
+  background-color: #1a237e !important;
+  color: white !important;
+}
+
+/* Spinner */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px;
+}
+
+/* Error */
+.error-card {
+  background-color: #ffebee;
+  margin-bottom: 24px;
+}
+
+.error-card mat-card-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #c62828;
+}
+
+/* Table */
+.providers-table {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+/* Badges */
+.badge-active {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-inactive {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.mat-mdc-tooltip {
+  background-color: #1a237e !important;
+  color: white !important;
+  font-size: 12px !important;
+}
