@@ -102,3 +102,38 @@
   text-align: center;
   padding: 24px 0;
 }
+
+/* Filter */
+.filter-card {
+  margin-bottom: 24px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.filter-select {
+  height: 56px;
+  padding: 0 16px;
+  font-size: 15px;
+  border: 1px solid #c5cae9;
+  border-radius: 6px;
+  background: white;
+  color: #212121;
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #1a237e;
+}
+
+.load-button {
+  height: 56px;
+  padding: 0 24px;
+  background-color: #1a237e !important;
+  color: white !important;
+}

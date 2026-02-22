@@ -42,6 +42,30 @@
     </mat-card>
   }
 
+  <!-- Filter -->
+  <mat-card class="filter-card" appearance="outlined">
+    <mat-card-content>
+      <div class="filter-row">
+        <select class="filter-select" [(ngModel)]="selectedMonth">
+          @for (month of months; track month.value) {
+            <option [ngValue]="month.value">{{ month.label }}</option>
+          }
+        </select>
+
+        <select class="filter-select" [(ngModel)]="selectedYear">
+          @for (year of years; track year) {
+            <option [ngValue]="year">{{ year }}</option>
+          }
+        </select>
+
+        <button mat-raised-button class="load-button" (click)="loadPayments()">
+          <mat-icon>search</mat-icon>
+          Load
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
   <!-- Loading -->
   @if (loading) {
     <div class="spinner-container">
@@ -67,7 +91,7 @@
       </mat-card-header>
       <mat-card-content>
         @if (payments.length === 0) {
-          <p class="no-data">No payments found for this account.</p>
+          <p class="no-data">No payments found for this period.</p>
         } @else {
           <table mat-table [dataSource]="payments" class="payments-table">
 

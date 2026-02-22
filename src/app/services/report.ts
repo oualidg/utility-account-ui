@@ -33,15 +33,19 @@ export class ReportService {
 
   private readonly baseUrl = `${environment.apiBaseUrl}/api/v1/reports`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getSummary(): Observable<ReportSummary> {
-    return this.http.get<ReportSummary>(`${this.baseUrl}/summary`);
+  getSummary(from?: string, to?: string): Observable<ReportSummary> {
+    let params = new HttpParams();
+    if (from) params = params.set('from', from);
+    if (to) params = params.set('to', to);
+    return this.http.get<ReportSummary>(`${this.baseUrl}/summary`, { params });
   }
 
-    getPaymentsByAccount(accountNumber: number): Observable<PaymentRecord[]> {
-    const params = new HttpParams().set('accountNumber', accountNumber);
+  getPaymentsByAccount(accountNumber: number, from?: string, to?: string): Observable<PaymentRecord[]> {
+    let params = new HttpParams().set('accountNumber', accountNumber);
+    if (from) params = params.set('from', from);
+    if (to) params = params.set('to', to);
     return this.http.get<PaymentRecord[]>(`${this.baseUrl}/payments`, { params });
   }
-
 }
