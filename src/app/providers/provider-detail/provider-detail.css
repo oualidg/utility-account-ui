@@ -5,16 +5,13 @@
 }
 
 .back-button {
-  margin-bottom: 16px;
   color: #1a237e;
 }
 
-/* Header */
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
 }
 
 .page-header h1 {
@@ -29,17 +26,26 @@
   gap: 12px;
 }
 
-/* Info card */
-.info-card {
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+.header-actions button[color="warn"] {
+  border-color: #c62828;
+  color: #c62828;
+}
+
+.header-actions button[color="primary"] {
+  border-color: #1a237e;
+  color: #1a237e;
+}
+
+.header-actions button:not([color]) {
+  border-color: #1a237e;
+  color: #1a237e;
 }
 
 .info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 24px;
-  margin-top: 16px;
+  gap: 16px;
+  margin-top: 8px;
 }
 
 .info-item {
@@ -58,10 +64,8 @@
 .info-value {
   font-size: 15px;
   color: #212121;
-  font-weight: 400;
 }
 
-/* Badges */
 .badge-active {
   background-color: #e8f5e9;
   color: #2e7d32;
@@ -80,52 +84,21 @@
   font-weight: 500;
 }
 
-/* Filter */
-.filter-card {
-  margin-bottom: 24px;
-}
-
 .filter-row {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.filter-select {
-  height: 56px;
-  padding: 0 16px;
-  font-size: 15px;
-  border: 1px solid #c5cae9;
-  border-radius: 6px;
-  background: white;
-  color: #212121;
-  cursor: pointer;
-  min-width: 150px;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #1a237e;
-}
-
 .load-button {
-  height: 56px;
-  padding: 0 24px;
   background-color: #1a237e !important;
   color: white !important;
 }
 
-/* Spinner */
 .spinner-container {
   display: flex;
   justify-content: center;
   padding: 48px;
-}
-
-/* Error */
-.error-card {
-  background-color: #ffebee;
-  margin-bottom: 24px;
 }
 
 .error-card mat-card-content {
@@ -135,7 +108,12 @@
   color: #c62828;
 }
 
-/* Payments table */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
 .payments-table {
   width: 100%;
   margin-top: 8px;
@@ -147,59 +125,6 @@
   padding: 24px 0;
 }
 
-.header-actions button[color="warn"] {
-  border-color: #c62828;
-  color: #c62828;
-}
-
-.header-actions button[color="primary"] {
-  border-color: #1a237e;
-  color: #1a237e;
-}
-
-.header-actions button:not([color]) {
-  border-color: #1a237e;
-  color: #1a237e;
-}
-
-/* Summary cards */
-.summary-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 24px;
-  margin-bottom: 24px;
-}
-
-.summary-card {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-}
-
-.summary-icon-row {
-  margin-bottom: 12px;
-}
-
-.summary-icon {
-  font-size: 32px;
-  width: 32px;
-  height: 32px;
-  color: #1a237e;
-}
-
-.summary-label {
-  font-size: 13px;
-  color: #757575;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-}
-
-.summary-value {
-  font-size: 28px;
-  font-weight: 500;
-  color: #1a237e;
-}
-
-/* Card header actions */
 .card-header-actions {
   margin-left: auto;
   padding: 16px 16px 0 0;

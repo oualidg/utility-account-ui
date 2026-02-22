@@ -1,19 +1,16 @@
 <div class="detail-container">
 
-  <!-- Back button -->
   <button mat-button (click)="goBack()" class="back-button">
     <mat-icon>arrow_back</mat-icon>
     Back to Providers
   </button>
 
-  <!-- Loading -->
   @if (loadingProvider) {
     <div class="spinner-container">
       <mat-spinner diameter="48" />
     </div>
   }
 
-  <!-- Error -->
   @if (error) {
     <mat-card class="error-card">
       <mat-card-content>
@@ -25,7 +22,6 @@
 
   @if (!loadingProvider && !error && provider) {
 
-    <!-- Header -->
     <div class="page-header">
       <h1>{{ provider.name }}</h1>
       <div class="header-actions">
@@ -47,7 +43,6 @@
       </div>
     </div>
 
-    <!-- Provider info -->
     <mat-card class="info-card" appearance="outlined">
       <mat-card-header>
         <mat-card-title>Provider Information</mat-card-title>
@@ -84,7 +79,6 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Filter -->
     <mat-card class="filter-card" appearance="outlined">
       <mat-card-content>
         <div class="filter-row">
@@ -93,13 +87,11 @@
               <option [ngValue]="month.value">{{ month.label }}</option>
             }
           </select>
-
           <select class="filter-select" [(ngModel)]="selectedYear">
             @for (year of years; track year) {
               <option [ngValue]="year">{{ year }}</option>
             }
           </select>
-
           <button mat-raised-button class="load-button" (click)="loadReconciliation()">
             <mat-icon>search</mat-icon>
             Load
@@ -108,7 +100,6 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Reconciliation summary -->
     @if (loadingRecon) {
       <div class="spinner-container">
         <mat-spinner diameter="48" />
@@ -117,32 +108,32 @@
 
     @if (!loadingRecon && reconciliation) {
 
-      <!-- Summary cards -->
       <div class="summary-cards">
         <mat-card class="summary-card" appearance="outlined">
           <mat-card-content>
-            <div class="summary-icon-row">
+            <div class="summary-row">
               <mat-icon class="summary-icon">payments</mat-icon>
+              <div>
+                <div class="summary-label">Total Transactions</div>
+                <div class="summary-value">{{ reconciliation.totalCount }}</div>
+              </div>
             </div>
-            <div class="summary-label">Total Transactions</div>
-            <div class="summary-value">{{ reconciliation.totalCount }}</div>
           </mat-card-content>
         </mat-card>
 
         <mat-card class="summary-card" appearance="outlined">
           <mat-card-content>
-            <div class="summary-icon-row">
+            <div class="summary-row">
               <mat-icon class="summary-icon">account_balance</mat-icon>
-            </div>
-            <div class="summary-label">Total Amount</div>
-            <div class="summary-value">
-              {{ reconciliation.totalAmount | currency:'ZAR':'symbol-narrow' }}
+              <div>
+                <div class="summary-label">Total Amount</div>
+                <div class="summary-value">{{ reconciliation.totalAmount | currency:'ZAR':'symbol-narrow' }}</div>
+              </div>
             </div>
           </mat-card-content>
         </mat-card>
       </div>
 
-      <!-- Payments table with download -->
       <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title>Payments ({{ reconciliation.payments.length }})</mat-card-title>
