@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProviderService, Provider } from '../services/provider';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { OnboardProviderDialogComponent } from './onboard-provider-dialog/onboard-provider-dialog';
 
 @Component({
   selector: 'app-providers',
@@ -116,8 +117,21 @@ export class ProvidersComponent implements OnInit {
   }
 
   onboard(): void {
-    // TODO: onboard dialog
-    console.log('onboard clicked');
+    const dialogRef = this.dialog.open(OnboardProviderDialogComponent, {
+      width: '480px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Show the new API key before reloading
+        navigator.clipboard.writeText(result.apiKey).then(() => {
+          alert(`Provider onboarded!\n\nAPI Key:\n${result.apiKey}\n\n✓ Copied to clipboard.\n\nStore this securely — it will not be shown again.`);
+        }).catch(() => {
+          alert(`Provider onboarded!\n\nAPI Key:\n${result.apiKey}\n\nStore this securely — it will not be shown again.`);
+        });
+        this.loadProviders();
+      }
+    });
   }
 
   goToProvider(id: number): void {

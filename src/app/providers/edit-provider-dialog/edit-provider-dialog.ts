@@ -5,10 +5,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { CustomerService, UpdateCustomerRequest, CustomerDetailed } from '../../services/customer';
+import { ProviderService, Provider, UpdateProviderRequest } from '../../services/provider';
 
 @Component({
-  selector: 'app-edit-customer-dialog',
+  selector: 'app-edit-provider-dialog',
   imports: [
     FormsModule,
     MatDialogModule,
@@ -17,27 +17,24 @@ import { CustomerService, UpdateCustomerRequest, CustomerDetailed } from '../../
     MatButtonModule,
     MatProgressSpinnerModule
   ],
-  templateUrl: './edit-customer-dialog.html',
-  styleUrl: './edit-customer-dialog.css'
+  templateUrl: './edit-provider-dialog.html',
+  styleUrl: './edit-provider-dialog.css'
 })
-export class EditCustomerDialogComponent {
+export class EditProviderDialogComponent {
 
-  form: UpdateCustomerRequest;
+  form: UpdateProviderRequest;
   loading = false;
   error = '';
   fieldErrors: { [key: string]: string } = {};
 
   constructor(
-    private dialogRef: MatDialogRef<EditCustomerDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public customer: CustomerDetailed,
-    private customerService: CustomerService,
+    private dialogRef: MatDialogRef<EditProviderDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public provider: Provider,
+    private providerService: ProviderService,
     private cdr: ChangeDetectorRef
   ) {
     this.form = {
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      email: customer.email,
-      mobileNumber: customer.mobileNumber
+      name: provider.name
     };
   }
 
@@ -46,12 +43,12 @@ export class EditCustomerDialogComponent {
     this.error = '';
     this.fieldErrors = {};
 
-    this.customerService.update(this.customer.customerId, this.form).subscribe({
+    this.providerService.update(this.provider.id, this.form).subscribe({
       next: (updated) => {
         this.dialogRef.close(updated);
       },
       error: (err) => {
-        this.error = err.error?.message || 'Failed to update customer';
+        this.error = err.error?.message || 'Failed to update provider';
         this.fieldErrors = err.error?.validationErrors || {};
         this.loading = false;
         this.cdr.detectChanges();

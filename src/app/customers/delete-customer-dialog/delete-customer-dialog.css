@@ -1,0 +1,18 @@
+.warning-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #c62828;
+  font-size: 13px;
+}
+
+.warning-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.delete-button {
+  background-color: #c62828 !important;
+  color: white !important;
+}

@@ -9,10 +9,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CustomerService, CustomerDetailed, Account } from '../../services/customer';
 import { DatePipe, CurrencyPipe } from '@angular/common';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { EditCustomerDialogComponent } from '../edit-customer-dialog/edit-customer-dialog';
+import { DeleteCustomerDialogComponent } from '../delete-customer-dialog/delete-customer-dialog';
 
 @Component({
   selector: 'app-customer-detail',
-imports: [
+  imports: [
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -21,7 +24,8 @@ imports: [
     MatProgressSpinnerModule,
     MatTooltipModule,
     DatePipe,
-    CurrencyPipe
+    CurrencyPipe,
+    MatDialogModule
   ],
   templateUrl: './customer-detail.html',
   styleUrl: './customer-detail.css'
@@ -38,8 +42,9 @@ export class CustomerDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private customerService: CustomerService,
+    private dialog: MatDialog,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -57,24 +62,41 @@ export class CustomerDetailComponent implements OnInit {
     });
   }
 
-goToPayments(account: Account): void {
-  this.router.navigate(
-    ['/customers', this.customer?.customerId, 'accounts', account.accountNumber],
-    { state: { account } }
-  );
-}
+  goToPayments(account: Account): void {
+    this.router.navigate(
+      ['/customers', this.customer?.customerId, 'accounts', account.accountNumber],
+      { state: { account } }
+    );
+  }
 
   goBack(): void {
     this.router.navigate(['/customers']);
   }
 
   edit(): void {
-    // TODO: open edit dialog
-    console.log('edit clicked');
+    const dialogRef = this.dialog.open(EditCustomerDialogComponent, {
+      width: '480px',
+      data: this.customer
+    });
+
+    dialogRef.afterClosed().subscribe(updated => {
+      if (updated) {
+        this.customer = updated;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   delete(): void {
-    // TODO: open confirm dialog
-    console.log('delete clicked');
+    const dialogRef = this.dialog.open(DeleteCustomerDialogComponent, {
+      width: '480px',
+      data: this.customer
+    });
+
+    dialogRef.afterClosed().subscribe(deleted => {
+      if (deleted) {
+        this.router.navigate(['/customers']);
+      }
+    });
   }
 }

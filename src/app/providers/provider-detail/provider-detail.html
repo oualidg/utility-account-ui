@@ -6,181 +6,187 @@
   </button>
 
   @if (loadingProvider) {
-    <div class="spinner-container">
-      <mat-spinner diameter="48" />
-    </div>
+  <div class="spinner-container">
+    <mat-spinner diameter="48" />
+  </div>
   }
 
   @if (error) {
-    <mat-card class="error-card">
-      <mat-card-content>
-        <mat-icon>error_outline</mat-icon>
-        <p>{{ error }}</p>
-      </mat-card-content>
-    </mat-card>
+  <mat-card class="error-card">
+    <mat-card-content>
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error }}</p>
+    </mat-card-content>
+  </mat-card>
   }
 
   @if (!loadingProvider && !error && provider) {
 
-    <div class="page-header">
-      <h1>{{ provider.name }}</h1>
-      <div class="header-actions">
-        @if (provider.active) {
-          <button mat-stroked-button color="warn" (click)="deactivate()">
-            <mat-icon>block</mat-icon>
-            Deactivate
-          </button>
-        } @else {
-          <button mat-stroked-button color="primary" (click)="reactivate()">
-            <mat-icon>check_circle</mat-icon>
-            Reactivate
-          </button>
-        }
-        <button mat-stroked-button (click)="regenerateKey()">
-          <mat-icon>key</mat-icon>
-          Regenerate Key
+  <div class="page-header">
+    <h1>{{ provider.name }}</h1>
+    <div class="header-actions">
+      @if (provider.active) {
+      <button mat-stroked-button color="warn" (click)="deactivate()">
+        <mat-icon>block</mat-icon>
+        Deactivate
+      </button>
+      } @else {
+      <button mat-stroked-button color="primary" (click)="reactivate()">
+        <mat-icon>check_circle</mat-icon>
+        Reactivate
+      </button>
+      }
+      <button mat-stroked-button (click)="regenerateKey()">
+        <mat-icon>key</mat-icon>
+        Regenerate Key
+      </button>
+
+      <button mat-stroked-button (click)="edit()">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </button>
+
+    </div>
+  </div>
+
+  <mat-card class="info-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Provider Information</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Code</span>
+          <span class="info-value">{{ provider.code }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Status</span>
+          <span class="info-value">
+            @if (provider.active) {
+            <span class="badge-active">Active</span>
+            } @else {
+            <span class="badge-inactive">Inactive</span>
+            }
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">API Key Prefix</span>
+          <span class="info-value">{{ provider.apiKeyPrefix }}...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Created</span>
+          <span class="info-value">{{ provider.createdAt | date:'medium' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Last Modified</span>
+          <span class="info-value">{{ provider.updatedAt | date:'medium' }}</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="filter-card" appearance="outlined">
+    <mat-card-content>
+      <div class="filter-row">
+        <select class="filter-select" [(ngModel)]="selectedMonth">
+          @for (month of months; track month.value) {
+          <option [ngValue]="month.value">{{ month.label }}</option>
+          }
+        </select>
+        <select class="filter-select" [(ngModel)]="selectedYear">
+          @for (year of years; track year) {
+          <option [ngValue]="year">{{ year }}</option>
+          }
+        </select>
+        <button mat-raised-button class="load-button" (click)="loadReconciliation()">
+          <mat-icon>search</mat-icon>
+          Load
         </button>
       </div>
-    </div>
+    </mat-card-content>
+  </mat-card>
 
-    <mat-card class="info-card" appearance="outlined">
-      <mat-card-header>
-        <mat-card-title>Provider Information</mat-card-title>
-      </mat-card-header>
+  @if (loadingRecon) {
+  <div class="spinner-container">
+    <mat-spinner diameter="48" />
+  </div>
+  }
+
+  @if (!loadingRecon && reconciliation) {
+
+  <div class="summary-cards">
+    <mat-card class="summary-card" appearance="outlined">
       <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="info-label">Code</span>
-            <span class="info-value">{{ provider.code }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Status</span>
-            <span class="info-value">
-              @if (provider.active) {
-                <span class="badge-active">Active</span>
-              } @else {
-                <span class="badge-inactive">Inactive</span>
-              }
-            </span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">API Key Prefix</span>
-            <span class="info-value">{{ provider.apiKeyPrefix }}...</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Created</span>
-            <span class="info-value">{{ provider.createdAt | date:'medium' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Last Modified</span>
-            <span class="info-value">{{ provider.updatedAt | date:'medium' }}</span>
+        <div class="summary-row">
+          <mat-icon class="summary-icon">payments</mat-icon>
+          <div>
+            <div class="summary-label">Total Transactions</div>
+            <div class="summary-value">{{ reconciliation.totalCount }}</div>
           </div>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="filter-card" appearance="outlined">
+    <mat-card class="summary-card" appearance="outlined">
       <mat-card-content>
-        <div class="filter-row">
-          <select class="filter-select" [(ngModel)]="selectedMonth">
-            @for (month of months; track month.value) {
-              <option [ngValue]="month.value">{{ month.label }}</option>
-            }
-          </select>
-          <select class="filter-select" [(ngModel)]="selectedYear">
-            @for (year of years; track year) {
-              <option [ngValue]="year">{{ year }}</option>
-            }
-          </select>
-          <button mat-raised-button class="load-button" (click)="loadReconciliation()">
-            <mat-icon>search</mat-icon>
-            Load
-          </button>
+        <div class="summary-row">
+          <mat-icon class="summary-icon">account_balance</mat-icon>
+          <div>
+            <div class="summary-label">Total Amount</div>
+            <div class="summary-value">{{ reconciliation.totalAmount | currency:'ZAR':'symbol-narrow' }}</div>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
+  </div>
 
-    @if (loadingRecon) {
-      <div class="spinner-container">
-        <mat-spinner diameter="48" />
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Payments ({{ reconciliation.payments.length }})</mat-card-title>
+      <div class="card-header-actions">
+        <button mat-stroked-button (click)="downloadCsv()" [disabled]="reconciliation.payments.length === 0">
+          <mat-icon>download</mat-icon>
+          Download CSV
+        </button>
       </div>
-    }
+    </mat-card-header>
+    <mat-card-content>
+      @if (reconciliation.payments.length === 0) {
+      <p class="no-data">No payments found for this period.</p>
+      } @else {
+      <table mat-table [dataSource]="reconciliation.payments" class="payments-table">
 
-    @if (!loadingRecon && reconciliation) {
+        <ng-container matColumnDef="receiptNumber">
+          <th mat-header-cell *matHeaderCellDef>Receipt</th>
+          <td mat-cell *matCellDef="let p">{{ p.receiptNumber }}</td>
+        </ng-container>
 
-      <div class="summary-cards">
-        <mat-card class="summary-card" appearance="outlined">
-          <mat-card-content>
-            <div class="summary-row">
-              <mat-icon class="summary-icon">payments</mat-icon>
-              <div>
-                <div class="summary-label">Total Transactions</div>
-                <div class="summary-value">{{ reconciliation.totalCount }}</div>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Amount</th>
+          <td mat-cell *matCellDef="let p">
+            {{ p.amount | currency:'ZAR':'symbol-narrow' }}
+          </td>
+        </ng-container>
 
-        <mat-card class="summary-card" appearance="outlined">
-          <mat-card-content>
-            <div class="summary-row">
-              <mat-icon class="summary-icon">account_balance</mat-icon>
-              <div>
-                <div class="summary-label">Total Amount</div>
-                <div class="summary-value">{{ reconciliation.totalAmount | currency:'ZAR':'symbol-narrow' }}</div>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
+        <ng-container matColumnDef="paymentDate">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let p">{{ p.paymentDate | date:'medium' }}</td>
+        </ng-container>
 
-      <mat-card appearance="outlined">
-        <mat-card-header>
-          <mat-card-title>Payments ({{ reconciliation.payments.length }})</mat-card-title>
-          <div class="card-header-actions">
-            <button mat-stroked-button (click)="downloadCsv()" [disabled]="reconciliation.payments.length === 0">
-              <mat-icon>download</mat-icon>
-              Download CSV
-            </button>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          @if (reconciliation.payments.length === 0) {
-            <p class="no-data">No payments found for this period.</p>
-          } @else {
-            <table mat-table [dataSource]="reconciliation.payments" class="payments-table">
+        <ng-container matColumnDef="accountNumber">
+          <th mat-header-cell *matHeaderCellDef>Account</th>
+          <td mat-cell *matCellDef="let p">{{ p.accountNumber }}</td>
+        </ng-container>
 
-              <ng-container matColumnDef="receiptNumber">
-                <th mat-header-cell *matHeaderCellDef>Receipt</th>
-                <td mat-cell *matCellDef="let p">{{ p.receiptNumber }}</td>
-              </ng-container>
+        <tr mat-header-row *matHeaderRowDef="paymentColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: paymentColumns"></tr>
 
-              <ng-container matColumnDef="amount">
-                <th mat-header-cell *matHeaderCellDef>Amount</th>
-                <td mat-cell *matCellDef="let p">
-                  {{ p.amount | currency:'ZAR':'symbol-narrow' }}
-                </td>
-              </ng-container>
+      </table>
+      }
+    </mat-card-content>
+  </mat-card>
 
-              <ng-container matColumnDef="paymentDate">
-                <th mat-header-cell *matHeaderCellDef>Date</th>
-                <td mat-cell *matCellDef="let p">{{ p.paymentDate | date:'medium' }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="accountNumber">
-                <th mat-header-cell *matHeaderCellDef>Account</th>
-                <td mat-cell *matCellDef="let p">{{ p.accountNumber }}</td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="paymentColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: paymentColumns"></tr>
-
-            </table>
-          }
-        </mat-card-content>
-      </mat-card>
-
-    }
+  }
 
   }
 

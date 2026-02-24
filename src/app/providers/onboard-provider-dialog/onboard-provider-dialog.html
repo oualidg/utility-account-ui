@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>Onboard Provider</h2>
+
+<mat-dialog-content>
+  @if (error) {
+    <p class="dialog-error">{{ error }}</p>
+  }
+
+<mat-form-field appearance="outline" class="full-width first-field">
+      <mat-label>
+      @if (fieldErrors['code']) {
+        <span style="color: #c62828">{{ fieldErrors['code'] }}</span>
+      } @else {
+        Code
+      }
+    </mat-label>
+    <input matInput [(ngModel)]="form.code" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>
+      @if (fieldErrors['name']) {
+        <span style="color: #c62828">{{ fieldErrors['name'] }}</span>
+      } @else {
+        Name
+      }
+    </mat-label>
+    <input matInput [(ngModel)]="form.name" />
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-raised-button class="submit-button" (click)="submit()"
+          [disabled]="loading || !form.code || !form.name">
+    @if (loading) {
+      <mat-spinner diameter="20" />
+    } @else {
+      Onboard Provider
+    }
+  </button>
+</mat-dialog-actions>

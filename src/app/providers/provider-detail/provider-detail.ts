@@ -10,6 +10,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProviderService, Provider } from '../../services/provider';
 import { ReportService, ProviderReconciliation } from '../../services/report';
+import { EditProviderDialogComponent } from '../edit-provider-dialog/edit-provider-dialog';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-provider-detail',
@@ -22,7 +24,8 @@ import { ReportService, ProviderReconciliation } from '../../services/report';
     MatIconModule,
     MatTableModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
   templateUrl: './provider-detail.html',
   styleUrl: './provider-detail.css'
@@ -62,6 +65,7 @@ export class ProviderDetailComponent implements OnInit {
     private router: Router,
     private providerService: ProviderService,
     private reportService: ReportService,
+    private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {
     const now = new Date();
@@ -199,5 +203,19 @@ export class ProviderDetailComponent implements OnInit {
     a.download = `recon-${this.provider?.code}-${this.selectedYear}-${String(this.selectedMonth).padStart(2, '0')}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  edit(): void {
+    const dialogRef = this.dialog.open(EditProviderDialogComponent, {
+      width: '480px',
+      data: this.provider
+    });
+
+    dialogRef.afterClosed().subscribe((updated: Provider) => {
+      if (updated) {
+        this.provider = updated;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }
