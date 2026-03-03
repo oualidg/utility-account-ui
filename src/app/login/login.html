@@ -1,0 +1,53 @@
+<div class="login-container">
+
+  <div class="login-card-wrapper">
+
+    <div class="login-header">
+      <mat-icon class="login-logo">bolt</mat-icon>
+      <h1>Utility Account</h1>
+      <p>Admin Portal</p>
+    </div>
+
+    <mat-card appearance="outlined" class="login-card">
+      <mat-card-content>
+
+        @if (error) {
+        <p class="dialog-error">{{ error }}</p>
+        }
+
+        <mat-form-field appearance="outline" class="full-width first-field">
+          <mat-label>Username</mat-label>
+          <input matInput [(ngModel)]="form.username" (keyup.enter)="login()" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput [(ngModel)]="form.password" [type]="hidePassword ? 'password' : 'text'"
+            (keyup.enter)="login()" />
+          <button matSuffix mat-icon-button (click)="hidePassword = !hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <button mat-raised-button class="login-button" (click)="login()" [disabled]="loading">
+          @if (loading) {
+          <mat-spinner diameter="20" />
+          } @else {
+          Sign In
+          }
+        </button>
+
+      </mat-card-content>
+    </mat-card>
+
+    @if (health) {
+    <div class="health-indicator">
+      <span class="health-dot" [class.health-up]="health.status === 'UP'"
+        [class.health-down]="health.status !== 'UP'"></span>
+      <span class="health-label">Backend {{ health.status }}</span>
+    </div>
+    }
+
+  </div>
+
+</div>

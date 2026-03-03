@@ -56,3 +56,98 @@
   color: #757575;
   margin: 0;
 }
+
+.health-card {
+  margin-top: 24px;
+}
+
+.health-loading {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.health-overall {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.health-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.health-up {
+  background-color: #2e7d32;
+}
+
+.health-down {
+  background-color: #c62828;
+}
+
+.health-status-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: #212121;
+}
+
+.health-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.health-table th {
+  text-align: left;
+  padding: 8px 12px;
+  color: #757575;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.health-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f5f5f5;
+  vertical-align: top;
+}
+
+.health-component-name {
+  font-weight: 500;
+  color: #212121;
+  text-transform: capitalize;
+}
+
+.health-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.badge-up {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge-down {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.health-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.health-detail-item {
+  font-size: 12px;
+  color: #757575;
+}

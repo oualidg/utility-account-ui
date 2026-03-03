@@ -5,6 +5,7 @@
       <mat-icon>bolt</mat-icon>
       <span>Utility Account</span>
     </div>
+
     <mat-nav-list>
       @for (item of navItems; track item.route) {
         <a mat-list-item
@@ -15,6 +16,20 @@
         </a>
       }
     </mat-nav-list>
+
+    <div class="shell-footer">
+      <div class="shell-user">
+        <mat-icon>account_circle</mat-icon>
+        <div class="shell-user-info">
+          <span class="shell-user-name">{{ authService.currentUser()?.firstName }} {{ authService.currentUser()?.lastName }}</span>
+          <span class="shell-user-role">{{ authService.currentUser()?.role }}</span>
+        </div>
+      </div>
+      <button mat-icon-button (click)="logout()" matTooltip="Logout">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+
   </mat-sidenav>
 
   <mat-sidenav-content class="shell-content">

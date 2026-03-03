@@ -165,3 +165,16 @@
   background-color: #1a237e !important;
   color: white !important;
 }
+
+.search-toggle button {
+  border: none;
+  background: white;
+  padding: 0 16px;
+  height: 56px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  color: #555;
+  border-right: 1px solid #c5cae9;
+  transition: background-color 0.15s, color 0.15s;
+}

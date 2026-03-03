@@ -17,4 +17,62 @@
     }
   </div>
 
+  <!-- Health Status -->
+  <mat-card class="health-card" appearance="outlined">
+    <mat-card-content>
+      @if (loadingHealth) {
+        <div class="health-loading">
+          <mat-spinner diameter="24" />
+        </div>
+      } @else if (health) {
+        <table class="health-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Status</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Overall status as first row -->
+            <tr>
+              <td class="health-component-name">Overall System Health</td>
+              <td>
+                <span class="health-badge"
+                      [class.badge-up]="health.status === 'UP'"
+                      [class.badge-down]="health.status !== 'UP'">
+                  {{ health.status }}
+                </span>
+              </td>
+              <td></td>
+            </tr>
+            @if (getComponentKeys().length > 0) {
+              @for (key of getComponentKeys(); track key) {
+                <tr>
+                  <td class="health-component-name">{{ key }}</td>
+                  <td>
+                    <span class="health-badge"
+                          [class.badge-up]="health.components![key].status === 'UP'"
+                          [class.badge-down]="health.components![key].status !== 'UP'">
+                      {{ health.components![key].status }}
+                    </span>
+                  </td>
+                  <td class="health-details">
+                    @if (health.components![key].details) {
+                      @for (detail of health.components![key].details | keyvalue; track detail.key) {
+                        @if (!isEmptyValue(detail.value)) {
+                          <span class="health-detail-item">{{ detail.key }}: {{ detail.value }}</span>
+                        }
+                      }
+                    }
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      }
+    </mat-card-content>
+  </mat-card>
+
 </div>
