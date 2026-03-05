@@ -8,12 +8,14 @@
 
     <mat-nav-list>
       @for (item of navItems; track item.route) {
-        <a mat-list-item
-           [routerLink]="item.route"
-           routerLinkActive="active-link">
-          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-          <span matListItemTitle>{{ item.label }}</span>
-        </a>
+        @if (!item.adminOnly || authService.isAdmin()) {
+          <a mat-list-item
+             [routerLink]="item.route"
+             routerLinkActive="active-link">
+            <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+            <span matListItemTitle>{{ item.label }}</span>
+          </a>
+        }
       }
     </mat-nav-list>
 
@@ -25,6 +27,9 @@
           <span class="shell-user-role">{{ authService.currentUser()?.role }}</span>
         </div>
       </div>
+      <button mat-icon-button (click)="openChangePassword()" matTooltip="Change Password">
+        <mat-icon>key</mat-icon>
+      </button>
       <button mat-icon-button (click)="logout()" matTooltip="Logout">
         <mat-icon>logout</mat-icon>
       </button>

@@ -1,0 +1,111 @@
+<div class="user-list-container">
+
+  <div class="page-header">
+    <h1>Users</h1>
+    <button mat-raised-button class="create-button" (click)="openCreateDialog()" [disabled]="loading">
+      <mat-icon>person_add</mat-icon>
+      Create User
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="spinner-container">
+      <mat-spinner diameter="48" />
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <mat-icon>error_outline</mat-icon>
+        <p>Failed to load users. Is the backend running?</p>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Table -->
+  @if (!loading && !error) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>All Users ({{ users.length }})</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="users" class="user-table">
+
+          <ng-container matColumnDef="username">
+            <th mat-header-cell *matHeaderCellDef>Username</th>
+            <td mat-cell *matCellDef="let u">
+              {{ u.username }}
+              @if (isSelf(u)) {
+                <span class="self-badge">you</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let u">{{ u.firstName }} {{ u.lastName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef>Role</th>
+            <td mat-cell *matCellDef="let u">
+              <mat-chip-set>
+                <mat-chip [class]="u.role === 'ROLE_ADMIN' ? 'chip-admin' : 'chip-operator'">
+                  {{ u.role === 'ROLE_ADMIN' ? 'Admin' : 'Operator' }}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let u">
+              <mat-chip-set>
+                <mat-chip [class]="u.enabled ? 'chip-active' : 'chip-disabled'">
+                  {{ u.enabled ? 'Active' : 'Disabled' }}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let u">
+              <div class="action-buttons">
+                <button mat-icon-button
+                        matTooltip="Edit user"
+                        (click)="openEditDialog(u)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button
+                        matTooltip="Reset password"
+                        (click)="openResetPasswordDialog(u)">
+                  <mat-icon>lock_reset</mat-icon>
+                </button>
+                <button mat-icon-button
+                        matTooltip="Delete user"
+                        [disabled]="isSelf(u)"
+                        (click)="openDeleteDialog(u)">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        </table>
+      </mat-card-content>
+    </mat-card>
+  }
+
+</div>

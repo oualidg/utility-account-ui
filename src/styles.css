@@ -158,3 +158,10 @@ mat-dialog-content .mat-mdc-form-field-subscript-wrapper {
 mat-dialog-content .first-field .mat-mdc-text-field-wrapper {
   margin-top: 8px;
 }
+
+
+
+/* Remove horizontal scrollbar from sidenav */
+.mat-drawer-inner-container {
+  overflow-x: hidden !important;
+}

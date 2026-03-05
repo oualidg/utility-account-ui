@@ -9,6 +9,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  id: number;
   username: string;
   firstName: string;
   lastName: string;
@@ -16,6 +17,7 @@ export interface LoginResponse {
 }
 
 export interface CurrentUser {
+  id: number;
   username: string;
   firstName: string;
   lastName: string;
@@ -39,6 +41,7 @@ export class AuthService {
     }).pipe(
       tap(response => {
         this.currentUser.set({
+          id: response.id,
           username: response.username,
           firstName: response.firstName,
           lastName: response.lastName,
@@ -54,6 +57,7 @@ export class AuthService {
     }).pipe(
       tap(response => {
         this.currentUser.set({
+          id: response.id,
           username: response.username,
           firstName: response.firstName,
           lastName: response.lastName,

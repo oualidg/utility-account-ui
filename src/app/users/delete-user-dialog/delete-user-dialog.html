@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Delete User</h2>
+
+<mat-dialog-content>
+  @if (error) {
+    <p class="dialog-error">{{ error }}</p>
+  }
+  <div class="confirm-panel">
+    <mat-icon class="danger-icon">delete_forever</mat-icon>
+    <p>Permanently delete <strong>{{ user.username }}</strong>?</p>
+    <p class="confirm-sub">This action cannot be undone.</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-raised-button class="danger-button" (click)="confirm()" [disabled]="loading">
+    @if (loading) {
+      <mat-spinner diameter="20" />
+    } @else {
+      Delete
+    }
+  </button>
+</mat-dialog-actions>

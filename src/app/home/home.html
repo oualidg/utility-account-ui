@@ -75,4 +75,19 @@
     </mat-card-content>
   </mat-card>
 
+  @if (appInfo?.app) {
+    <div class="app-footer">
+      <span>{{ appInfo!.app!.name }} · v{{ appInfo!.app!.version }}</span>
+      <span class="app-footer-sep">·</span>
+      <span>{{ appInfo!.app!.author }}</span>
+      @if (appInfo!.app!.contact?.github) {
+        <span class="app-footer-sep">·</span>
+        <a [href]="appInfo!.app!.contact!.github" target="_blank" rel="noopener">
+          <mat-icon class="github-icon">open_in_new</mat-icon>
+          GitHub
+        </a>
+      }
+    </div>
+  }
+
 </div>

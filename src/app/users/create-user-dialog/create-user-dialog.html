@@ -1,0 +1,89 @@
+<h2 mat-dialog-title>Create User</h2>
+
+<mat-dialog-content>
+
+  @if (temporaryPassword) {
+    <div class="success-panel">
+      <mat-icon class="success-icon">check_circle</mat-icon>
+      <p class="success-title">User created successfully</p>
+      <p class="success-sub">Share this temporary password with the user. It will not be shown again.</p>
+      <div class="temp-password-box">
+        <span class="temp-password-value">{{ showTempPassword ? temporaryPassword : '••••••••••••' }}</span>
+        <button mat-icon-button type="button" (click)="showTempPassword = !showTempPassword">
+          <mat-icon>{{ showTempPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+    </div>
+  } @else {
+    @if (error) {
+      <p class="dialog-error">{{ error }}</p>
+    }
+
+    <mat-form-field appearance="outline" class="full-width first-field">
+      <mat-label>
+        @if (fieldErrors['username']) {
+          <span style="color: #c62828">{{ fieldErrors['username'] }}</span>
+        } @else { Username }
+      </mat-label>
+      <input matInput [(ngModel)]="form.username" autocomplete="off" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>
+        @if (fieldErrors['firstName']) {
+          <span style="color: #c62828">{{ fieldErrors['firstName'] }}</span>
+        } @else { First Name }
+      </mat-label>
+      <input matInput [(ngModel)]="form.firstName" autocomplete="off" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>
+        @if (fieldErrors['lastName']) {
+          <span style="color: #c62828">{{ fieldErrors['lastName'] }}</span>
+        } @else { Last Name }
+      </mat-label>
+      <input matInput [(ngModel)]="form.lastName" autocomplete="off" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>
+        @if (fieldErrors['email']) {
+          <span style="color: #c62828">{{ fieldErrors['email'] }}</span>
+        } @else { Email }
+      </mat-label>
+      <input matInput [(ngModel)]="form.email" type="email" autocomplete="off" />
+    </mat-form-field>
+
+    <div class="native-select-field">
+      <label class="native-select-label">Role</label>
+      <select class="native-select" [(ngModel)]="form.role">
+        @for (r of roles; track r.value) {
+          <option [value]="r.value">{{ r.label }}</option>
+        }
+      </select>
+    </div>
+
+    <p class="temp-password-note">
+      <mat-icon>info</mat-icon>
+      A temporary password will be generated and shown once after creation.
+    </p>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (temporaryPassword) {
+    <button mat-raised-button class="submit-button" (click)="done()">Done</button>
+  } @else {
+    <button mat-button (click)="cancel()">Cancel</button>
+    <button mat-raised-button class="submit-button" (click)="submit()"
+      [disabled]="loading || !isFormValid()">
+      @if (loading) {
+        <mat-spinner diameter="20" />
+      } @else {
+        Create User
+      }
+    </button>
+  }
+</mat-dialog-actions>

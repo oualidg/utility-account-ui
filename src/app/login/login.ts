@@ -48,7 +48,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
 ngOnInit(): void {
   this.checkHealth();
-  this.healthSub = interval(5000).pipe(
+  this.healthSub = interval(15000).pipe(
     switchMap(() => this.healthService.getHealth().pipe(
       catchError(() => of({ status: 'DOWN' }))
     ))
