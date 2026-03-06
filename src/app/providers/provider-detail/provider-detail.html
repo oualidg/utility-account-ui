@@ -40,15 +40,14 @@
         <mat-icon>key</mat-icon>
         Regenerate Key
       </button>
-
       <button mat-stroked-button (click)="edit()">
         <mat-icon>edit</mat-icon>
         Edit
       </button>
-
     </div>
   </div>
 
+  <!-- Provider Information -->
   <mat-card class="info-card" appearance="outlined">
     <mat-card-header>
       <mat-card-title>Provider Information</mat-card-title>
@@ -85,6 +84,7 @@
     </mat-card-content>
   </mat-card>
 
+  <!-- Reconciliation -->
   <mat-card class="filter-card" appearance="outlined">
     <mat-card-content>
       <div class="filter-row">
@@ -98,9 +98,14 @@
           <option [ngValue]="year">{{ year }}</option>
           }
         </select>
-        <button mat-raised-button class="load-button" (click)="loadReconciliation()">
-          <mat-icon>search</mat-icon>
+        <button mat-raised-button class="load-button" (click)="loadSummary()">
+          <mat-icon>bar_chart</mat-icon>
           Load
+        </button>
+        <button mat-stroked-button (click)="downloadCsv()"
+                [disabled]="!providerSummary || loadingRecon">
+          <mat-icon>download</mat-icon>
+          Download CSV
         </button>
       </div>
     </mat-card-content>
@@ -112,8 +117,9 @@
   </div>
   }
 
-  @if (!loadingRecon && reconciliation) {
+  @if (!loadingRecon && providerSummary) {
 
+  <!-- Summary cards -->
   <div class="summary-cards">
     <mat-card class="summary-card" appearance="outlined">
       <mat-card-content>
@@ -121,7 +127,7 @@
           <mat-icon class="summary-icon">payments</mat-icon>
           <div>
             <div class="summary-label">Total Transactions</div>
-            <div class="summary-value">{{ reconciliation.totalCount }}</div>
+            <div class="summary-value">{{ providerSummary.totalCount }}</div>
           </div>
         </div>
       </mat-card-content>
@@ -133,28 +139,66 @@
           <mat-icon class="summary-icon">account_balance</mat-icon>
           <div>
             <div class="summary-label">Total Amount</div>
-            <div class="summary-value">{{ reconciliation.totalAmount | currency:'ZAR':'symbol-narrow' }}</div>
+            <div class="summary-value">
+              {{ providerSummary.totalAmount | currency:'ZAR':'symbol-narrow' }}
+            </div>
           </div>
         </div>
       </mat-card-content>
     </mat-card>
   </div>
 
+  <!-- Payment search within period -->
   <mat-card appearance="outlined">
     <mat-card-header>
-      <mat-card-title>Payments ({{ reconciliation.payments.length }})</mat-card-title>
-      <div class="card-header-actions">
-        <button mat-stroked-button (click)="downloadCsv()" [disabled]="reconciliation.payments.length === 0">
-          <mat-icon>download</mat-icon>
-          Download CSV
-        </button>
-      </div>
+      <mat-card-title>Search within {{ periodLabel }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      @if (reconciliation.payments.length === 0) {
-      <p class="no-data">No payments found for this period.</p>
+
+      <div class="search-row">
+        <div class="search-toggle">
+          <button [class.active-toggle]="searchType === 'Account Number'"
+            (click)="searchType = 'Account Number'; clearSearch()">
+            Account Number
+          </button>
+          <button [class.active-toggle]="searchType === 'Receipt'"
+            (click)="searchType = 'Receipt'; clearSearch()">
+            Receipt
+          </button>
+        </div>
+
+        <mat-form-field appearance="outline" class="search-input" subscriptSizing="dynamic">
+          <mat-label>Enter {{ searchType }}...</mat-label>
+          <input matInput [(ngModel)]="searchValue" (keyup.enter)="search()">
+          @if (searchValue) {
+          <button matSuffix mat-icon-button (click)="clearSearch()">
+            <mat-icon>close</mat-icon>
+          </button>
+          }
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" class="search-button"
+                (click)="search()" [disabled]="searching">
+          @if (searching) {
+          <mat-spinner diameter="20" />
+          } @else {
+          Search
+          }
+        </button>
+      </div>
+
+      @if (searchError) {
+      <p class="search-error">{{ searchError }}</p>
+      }
+
+      <!-- Search results -->
+      @if (!hasSearched) {
+      <p class="search-hint">Enter an account number or receipt to search within {{ periodLabel }}.</p>
+      } @else if (searchResults.length === 0) {
+      <p class="search-hint">No payments found.</p>
       } @else {
-      <table mat-table [dataSource]="reconciliation.payments" class="payments-table">
+      <p class="search-results-count">{{ searchResults.length }} result{{ searchResults.length !== 1 ? 's' : '' }} found</p>
+      <table mat-table [dataSource]="searchResults" class="payments-table">
 
         <ng-container matColumnDef="receiptNumber">
           <th mat-header-cell *matHeaderCellDef>Receipt</th>
@@ -183,6 +227,7 @@
 
       </table>
       }
+
     </mat-card-content>
   </mat-card>
 

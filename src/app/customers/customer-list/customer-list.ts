@@ -6,7 +6,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CustomerService, CustomerSummary } from '../../services/customer';
@@ -22,7 +21,6 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
     MatIconModule,
     MatButtonModule,
     MatInputModule,
-    MatSelectModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
     MatDialogModule
@@ -32,19 +30,27 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 })
 export class CustomerListComponent implements OnInit {
 
-  // Full list
-  allCustomers: CustomerSummary[] = [];
-  displayedCustomers: CustomerSummary[] = [];
+  // Table data
+  customers: CustomerSummary[] = [];
   loadingList = true;
   listError = false;
 
-  // Search
+  // Pagination state
+  totalElements = 0;
+  pageSize = 10;
+  pageIndex = 0;
+
+  // Search state
   searchType = 'ID';
   searchValue = '';
   searching = false;
   searchError = '';
 
-  displayedColumns = ['customerId', 'firstName', 'lastName', 'email', 'mobileNumber', 'action'];
+  // Track whether we are in search mode so pagination calls the right endpoint
+  activeSearchType: string | null = null;
+  activeSearchValue: string | null = null;
+
+  displayedColumns = ['customerId', 'firstName', 'lastName', 'mobileNumber', 'action'];
 
   constructor(
     private customerService: CustomerService,
@@ -54,28 +60,92 @@ export class CustomerListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.customerService.getAll().subscribe({
-      next: (data) => {
-        this.allCustomers = data;
-        this.displayedCustomers = data;
-        this.loadingList = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.listError = true;
-        this.loadingList = false;
-        this.cdr.detectChanges();
-      }
-    });
+    this.loadPage();
   }
+
+  // -------------------------------------------------------------------------
+  // Data loading
+  // -------------------------------------------------------------------------
+
+  loadPage(): void {
+    this.loadingList = true;
+    this.listError = false;
+
+    if (this.activeSearchType === 'Mobile' && this.activeSearchValue) {
+      this.customerService.searchByMobile(this.activeSearchValue, this.pageIndex, this.pageSize)
+        .subscribe({
+          next: (page) => this.handlePage(page),
+          error: () => this.handleError()
+        });
+
+    } else if (this.activeSearchType === 'Surname' && this.activeSearchValue) {
+      this.customerService.searchBySurname(this.activeSearchValue, this.pageIndex, this.pageSize)
+        .subscribe({
+          next: (page) => this.handlePage(page),
+          error: () => this.handleError()
+        });
+
+    } else {
+      this.customerService.getAll(this.pageIndex, this.pageSize)
+        .subscribe({
+          next: (page) => this.handlePage(page),
+          error: () => this.handleError()
+        });
+    }
+  }
+
+  private handlePage(page: { content: CustomerSummary[]; totalElements: number }): void {
+    this.customers = page.content;
+    this.totalElements = page.totalElements;
+    this.loadingList = false;
+    this.cdr.detectChanges();
+  }
+
+  private handleError(): void {
+    this.listError = true;
+    this.loadingList = false;
+    this.cdr.detectChanges();
+  }
+
+  // -------------------------------------------------------------------------
+  // Pagination
+  // -------------------------------------------------------------------------
+
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
+    this.pageIndex = 0;
+    this.loadPage();
+  }
+
+  onPrevPage(): void {
+    if (this.pageIndex > 0) {
+      this.pageIndex--;
+      this.loadPage();
+    }
+  }
+
+  onNextPage(): void {
+    if ((this.pageIndex + 1) * this.pageSize < this.totalElements) {
+      this.pageIndex++;
+      this.loadPage();
+    }
+  }
+
+  min(a: number, b: number): number {
+    return Math.min(a, b);
+  }
+
+  // -------------------------------------------------------------------------
+  // Search
+  // -------------------------------------------------------------------------
 
   search(): void {
     if (!this.searchValue.trim()) return;
 
-    this.searching = true;
     this.searchError = '';
 
     if (this.searchType === 'ID') {
+      this.searching = true;
       this.customerService.getById(Number(this.searchValue)).subscribe({
         next: (customer) => {
           this.searching = false;
@@ -88,27 +158,35 @@ export class CustomerListComponent implements OnInit {
         }
       });
 
-    } else if (this.searchType === 'Mobile') {
-      this.customerService.searchByMobile(this.searchValue).subscribe({
-        next: (customers) => {
-          this.displayedCustomers = customers;
-          this.searching = false;
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          this.searching = false;
-          this.searchError = err.error?.message || 'Something went wrong';
-          this.cdr.detectChanges();
-        }
-      });
+    } else {
+      // Mobile or Surname — paginated search
+      this.activeSearchType = this.searchType;
+      this.activeSearchValue = this.searchValue;
+      this.pageIndex = 0;
+      this.loadPage();
     }
   }
 
   clearSearch(): void {
     this.searchValue = '';
     this.searchError = '';
-    this.displayedCustomers = this.allCustomers;
+
+    // Only reload if we were in search mode — avoids unnecessary API call
+    // when the user simply switches between toggle types
+    if (this.activeSearchType !== null) {
+      this.activeSearchType = null;
+      this.activeSearchValue = null;
+      this.pageIndex = 0;
+      this.loadPage();
+    } else {
+      this.activeSearchType = null;
+      this.activeSearchValue = null;
+    }
   }
+
+  // -------------------------------------------------------------------------
+  // Navigation
+  // -------------------------------------------------------------------------
 
   goToCustomer(id: number): void {
     this.router.navigate(['/customers', id]);
@@ -121,7 +199,7 @@ export class CustomerListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(customer => {
       if (customer) {
-        this.ngOnInit();
+        this.clearSearch();
       }
     });
   }

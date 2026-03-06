@@ -8,8 +8,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { ProviderService, Provider } from '../../services/provider';
-import { ReportService, ProviderReconciliation } from '../../services/report';
+import { ReportService, ProviderReconciliation, ProviderSummary, PaymentRecord } from '../../services/report';
 import { EditProviderDialogComponent } from '../edit-provider-dialog/edit-provider-dialog';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 
@@ -25,6 +27,8 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
     MatTableModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    MatInputModule,
+    MatFormFieldModule,
     MatDialogModule
   ],
   templateUrl: './provider-detail.html',
@@ -33,10 +37,18 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 export class ProviderDetailComponent implements OnInit {
 
   provider: Provider | null = null;
-  reconciliation: ProviderReconciliation | null = null;
+  providerSummary: ProviderSummary | null = null;
   loadingProvider = true;
   loadingRecon = false;
   error = '';
+
+  // Payment search within period
+  searchType = 'Account Number';
+  searchValue = '';
+  searching = false;
+  searchError = '';
+  searchResults: PaymentRecord[] = [];
+  hasSearched = false;
 
   paymentColumns = ['receiptNumber', 'amount', 'paymentDate', 'accountNumber'];
 
@@ -83,7 +95,7 @@ export class ProviderDetailComponent implements OnInit {
       next: (data) => {
         this.provider = data;
         this.loadingProvider = false;
-        this.loadReconciliation();
+        this.loadSummary();
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -94,31 +106,148 @@ export class ProviderDetailComponent implements OnInit {
     });
   }
 
-  loadReconciliation(): void {
+  // -------------------------------------------------------------------------
+  // Period label — shown in the search card title
+  // -------------------------------------------------------------------------
+
+  get periodLabel(): string {
+    const month = this.months.find(m => m.value === this.selectedMonth)?.label ?? '';
+    return `${month} ${this.selectedYear}`;
+  }
+
+  // -------------------------------------------------------------------------
+  // Load summary (totals only — no payment list)
+  // -------------------------------------------------------------------------
+
+  loadSummary(): void {
     if (!this.provider) return;
     this.loadingRecon = true;
-    this.reconciliation = null;
+    this.providerSummary = null;
+    this.searchResults = [];
+    this.hasSearched = false;
+    this.searchValue = '';
+    this.searchError = '';
 
-    const from = new Date(Date.UTC(this.selectedYear, this.selectedMonth - 1, 1));
-    const to = new Date(Date.UTC(this.selectedYear, this.selectedMonth, 0, 23, 59, 59));
+    const { from, to } = this.periodRange();
 
-    this.reportService.getReconciliation(
-      this.provider.code,
-      from.toISOString(),
-      to.toISOString()
-    ).subscribe({
+    this.reportService.getProviderSummary(this.provider.code, from, to).subscribe({
       next: (data) => {
-        this.reconciliation = data;
+        this.providerSummary = data;
         this.loadingRecon = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.error = err.error?.message || 'Failed to load reconciliation';
+        this.error = err.error?.message || 'Failed to load summary';
         this.loadingRecon = false;
         this.cdr.detectChanges();
       }
     });
   }
+
+  // -------------------------------------------------------------------------
+  // Payment search within the loaded period
+  // -------------------------------------------------------------------------
+
+  search(): void {
+    if (!this.searchValue.trim() || !this.provider) return;
+
+    this.searching = true;
+    this.searchError = '';
+    this.searchResults = [];
+    this.hasSearched = false;
+
+    const { from, to } = this.periodRange();
+    const isAccountSearch = this.searchType === 'Account Number';
+
+    this.reportService.searchProviderPayments(
+      this.provider.code,
+      isAccountSearch ? Number(this.searchValue) : undefined,
+      !isAccountSearch ? this.searchValue.trim() : undefined,
+      from,
+      to
+    ).subscribe({
+      next: (payments) => {
+        this.searchResults = payments;
+        this.hasSearched = true;
+        this.searching = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.searchError = err.error?.message || 'Search failed';
+        this.searching = false;
+        this.hasSearched = true;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  clearSearch(): void {
+    this.searchValue = '';
+    this.searchError = '';
+    this.searchResults = [];
+    this.hasSearched = false;
+  }
+
+  // -------------------------------------------------------------------------
+  // CSV export — calls full reconciliation endpoint, not the summary
+  // -------------------------------------------------------------------------
+
+  downloadCsv(): void {
+    if (!this.provider || !this.providerSummary) return;
+
+    const { from, to } = this.periodRange();
+
+    this.reportService.getReconciliation(this.provider.code, from, to).subscribe({
+      next: (reconciliation) => {
+        this.buildAndDownloadCsv(reconciliation);
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'Failed to download CSV';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private buildAndDownloadCsv(reconciliation: ProviderReconciliation): void {
+    const summary = [
+      ['Provider', reconciliation.providerName],
+      ['Period', this.periodLabel],
+      ['Total Transactions', reconciliation.totalCount],
+      ['Total Amount', reconciliation.totalAmount],
+      [],
+      ['Receipt', 'Amount', 'Date', 'Account']
+    ];
+
+    const rows = reconciliation.payments.map(p => [
+      p.receiptNumber,
+      p.amount,
+      p.paymentDate,
+      p.accountNumber
+    ]);
+
+    const csv = [...summary, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `recon-${this.provider?.code}-${this.selectedYear}-${String(this.selectedMonth).padStart(2, '0')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // -------------------------------------------------------------------------
+  // Helpers
+  // -------------------------------------------------------------------------
+
+  private periodRange(): { from: string; to: string } {
+    const from = new Date(Date.UTC(this.selectedYear, this.selectedMonth - 1, 1));
+    const to = new Date(Date.UTC(this.selectedYear, this.selectedMonth, 0, 23, 59, 59));
+    return { from: from.toISOString(), to: to.toISOString() };
+  }
+
+  // -------------------------------------------------------------------------
+  // Provider actions
+  // -------------------------------------------------------------------------
 
   goBack(): void {
     this.router.navigate(['/providers']);
@@ -172,37 +301,6 @@ export class ProviderDetailComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
-  }
-
-  downloadCsv(): void {
-    if (!this.reconciliation) return;
-
-    const period = `${this.months.find(m => m.value === this.selectedMonth)?.label} ${this.selectedYear}`;
-
-    const summary = [
-      ['Provider', this.reconciliation.providerName],
-      ['Period', period],
-      ['Total Transactions', this.reconciliation.totalCount],
-      ['Total Amount', this.reconciliation.totalAmount],
-      [],
-      ['Receipt', 'Amount', 'Date', 'Account']
-    ];
-
-    const rows = this.reconciliation.payments.map(p => [
-      p.receiptNumber,
-      p.amount,
-      p.paymentDate,
-      p.accountNumber
-    ]);
-
-    const csv = [...summary, ...rows].map(r => r.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `recon-${this.provider?.code}-${this.selectedYear}-${String(this.selectedMonth).padStart(2, '0')}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
   }
 
   edit(): void {
