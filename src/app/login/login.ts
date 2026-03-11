@@ -44,19 +44,19 @@ export class LoginComponent implements OnInit, OnDestroy {
     private healthService: HealthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
-ngOnInit(): void {
-  this.checkHealth();
-  this.healthSub = interval(15000).pipe(
-    switchMap(() => this.healthService.getHealth().pipe(
-      catchError(() => of({ status: 'DOWN' }))
-    ))
-  ).subscribe(data => {
-    this.health = data;
-    this.cdr.detectChanges();
-  });
-}
+  ngOnInit(): void {
+    this.checkHealth();
+    this.healthSub = interval(15000).pipe(
+      switchMap(() => this.healthService.getHealth().pipe(
+        catchError(() => of({ status: 'DOWN' }))
+      ))
+    ).subscribe(data => {
+      this.health = data;
+      this.cdr.detectChanges();
+    });
+  }
 
   ngOnDestroy(): void {
     this.healthSub?.unsubscribe();
@@ -76,6 +76,10 @@ ngOnInit(): void {
   }
 
   login(): void {
+    if (!this.form.username || !this.form.password) {
+      this.error = 'Please enter your username and password';
+      return;
+    }
     this.loading = true;
     this.error = '';
 
