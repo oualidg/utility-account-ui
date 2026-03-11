@@ -192,14 +192,15 @@ export class CustomerListComponent implements OnInit {
     this.router.navigate(['/customers', id]);
   }
 
-  onboard(): void {
+onboard(): void {
     const dialogRef = this.dialog.open(OnboardCustomerDialogComponent, {
       width: '480px'
     });
 
     dialogRef.afterClosed().subscribe(customer => {
       if (customer) {
-        this.clearSearch();
+        this.pageIndex = 0;      // [ADDED] reset to first page
+        this.loadPage();         // [ADDED] reload list directly
       }
     });
   }
