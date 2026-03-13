@@ -50,21 +50,26 @@ export class ProviderDetailComponent implements OnInit {
   searchResults: PaymentRecord[] = [];
   hasSearched = false;
 
+  // Pagination state for search results
+  totalElements = 0;
+  pageSize = 10;
+  pageIndex = 0;
+
   paymentColumns = ['receiptNumber', 'amount', 'paymentDate', 'accountNumber'];
 
   selectedMonth: number;
   selectedYear: number;
 
   months = [
-    { value: 1, label: 'January' },
-    { value: 2, label: 'February' },
-    { value: 3, label: 'March' },
-    { value: 4, label: 'April' },
-    { value: 5, label: 'May' },
-    { value: 6, label: 'June' },
-    { value: 7, label: 'July' },
-    { value: 8, label: 'August' },
-    { value: 9, label: 'September' },
+    { value: 1,  label: 'January' },
+    { value: 2,  label: 'February' },
+    { value: 3,  label: 'March' },
+    { value: 4,  label: 'April' },
+    { value: 5,  label: 'May' },
+    { value: 6,  label: 'June' },
+    { value: 7,  label: 'July' },
+    { value: 8,  label: 'August' },
+    { value: 9,  label: 'September' },
     { value: 10, label: 'October' },
     { value: 11, label: 'November' },
     { value: 12, label: 'December' }
@@ -124,6 +129,8 @@ export class ProviderDetailComponent implements OnInit {
     this.loadingRecon = true;
     this.providerSummary = null;
     this.searchResults = [];
+    this.totalElements = 0;
+    this.pageIndex = 0;
     this.hasSearched = false;
     this.searchValue = '';
     this.searchError = '';
@@ -148,12 +155,18 @@ export class ProviderDetailComponent implements OnInit {
   // Payment search within the loaded period
   // -------------------------------------------------------------------------
 
+  /** Called by the Search button — resets to page 0. */
   search(): void {
     if (!this.searchValue.trim() || !this.provider) return;
+    this.pageIndex = 0;
+    this.searchPage();
+  }
+
+  searchPage(): void {
+    if (!this.provider) return;
 
     this.searching = true;
     this.searchError = '';
-    this.searchResults = [];
     this.hasSearched = false;
 
     const { from, to } = this.periodRange();
@@ -164,28 +177,61 @@ export class ProviderDetailComponent implements OnInit {
       isAccountSearch ? Number(this.searchValue) : undefined,
       !isAccountSearch ? this.searchValue.trim() : undefined,
       from,
-      to
+      to,
+      this.pageIndex,
+      this.pageSize
     ).subscribe({
-      next: (payments) => {
-        this.searchResults = payments;
-        this.hasSearched = true;
-        this.searching = false;
+      next: (page) => {
+        this.searchResults = page.content;
+        this.totalElements = page.totalElements;
+        this.hasSearched   = true;
+        this.searching     = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.searchError = err.error?.message || 'Search failed';
-        this.searching = false;
-        this.hasSearched = true;
+        this.searchError   = err.error?.message || 'Search failed';
+        this.searching     = false;
+        this.hasSearched   = true;
         this.cdr.detectChanges();
       }
     });
   }
 
   clearSearch(): void {
-    this.searchValue = '';
-    this.searchError = '';
+    this.searchValue   = '';
+    this.searchError   = '';
     this.searchResults = [];
-    this.hasSearched = false;
+    this.totalElements = 0;
+    this.pageIndex     = 0;
+    this.hasSearched   = false;
+  }
+
+  // -------------------------------------------------------------------------
+  // Pagination for search results
+  // -------------------------------------------------------------------------
+
+  onPageSizeChange(newSize: number): void {
+    this.pageSize  = newSize;
+    this.pageIndex = 0;
+    this.searchPage();
+  }
+
+  onPrevPage(): void {
+    if (this.pageIndex > 0) {
+      this.pageIndex--;
+      this.searchPage();
+    }
+  }
+
+  onNextPage(): void {
+    if ((this.pageIndex + 1) * this.pageSize < this.totalElements) {
+      this.pageIndex++;
+      this.searchPage();
+    }
+  }
+
+  min(a: number, b: number): number {
+    return Math.min(a, b);
   }
 
   // -------------------------------------------------------------------------
@@ -227,9 +273,9 @@ export class ProviderDetailComponent implements OnInit {
 
     const csv = [...summary, ...rows].map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
     a.download = `recon-${this.provider?.code}-${this.selectedYear}-${String(this.selectedMonth).padStart(2, '0')}.csv`;
     a.click();
     URL.revokeObjectURL(url);
@@ -241,7 +287,7 @@ export class ProviderDetailComponent implements OnInit {
 
   private periodRange(): { from: string; to: string } {
     const from = new Date(Date.UTC(this.selectedYear, this.selectedMonth - 1, 1));
-    const to = new Date(Date.UTC(this.selectedYear, this.selectedMonth, 0, 23, 59, 59));
+    const to   = new Date(Date.UTC(this.selectedYear, this.selectedMonth, 0, 23, 59, 59));
     return { from: from.toISOString(), to: to.toISOString() };
   }
 

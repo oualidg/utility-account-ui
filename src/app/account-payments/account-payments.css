@@ -64,11 +64,21 @@
   padding: 48px;
 }
 
+.error-card {
+  background-color: #ffebee;
+  margin-bottom: 24px;
+}
+
 .error-card mat-card-content {
   display: flex;
   align-items: center;
   gap: 12px;
   color: #c62828;
+}
+
+/* Filter */
+.filter-card {
+  margin-bottom: 24px;
 }
 
 .filter-row {
@@ -77,11 +87,29 @@
   gap: 16px;
 }
 
+.filter-select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #c5cae9;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  background: white;
+  color: #212121;
+  cursor: pointer;
+  outline: none;
+}
+
+.filter-select:focus {
+  border-color: #1a237e;
+}
+
 .load-button {
   background-color: #1a237e !important;
   color: white !important;
 }
 
+/* Table */
 .payments-table {
   width: 100%;
   margin-top: 8px;
@@ -91,4 +119,44 @@
   color: #757575;
   text-align: center;
   padding: 24px 0;
+}
+
+/* Paginator — same pattern as customer list */
+.paginator-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 8px 0 4px 0;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 8px;
+}
+
+.paginator-page-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.paginator-label {
+  font-size: 14px;
+  color: #757575;
+}
+
+.paginator-select {
+  min-width: 70px !important;
+  height: 36px;
+  padding: 0 8px;
+}
+
+.paginator-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.paginator-range {
+  font-size: 14px;
+  color: #757575;
+  margin-right: 4px;
 }

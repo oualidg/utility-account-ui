@@ -87,10 +87,10 @@
   @if (!loading && !error) {
     <mat-card appearance="outlined">
       <mat-card-header>
-        <mat-card-title>Payments ({{ payments.length }})</mat-card-title>
+        <mat-card-title>Payments ({{ totalElements }})</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        @if (payments.length === 0) {
+        @if (totalElements === 0) {
           <p class="no-data">No payments found for this period.</p>
         } @else {
           <table mat-table [dataSource]="payments" class="payments-table">
@@ -121,6 +121,32 @@
             <tr mat-row *matRowDef="let row; columns: paymentColumns"></tr>
 
           </table>
+
+          <!-- Paginator — same pattern as customer list -->
+          <div class="paginator-row">
+            <div class="paginator-page-size">
+              <span class="paginator-label">Items per page:</span>
+              <select class="filter-select paginator-select"
+                      [ngModel]="pageSize"
+                      (ngModelChange)="onPageSizeChange($event)">
+                <option [ngValue]="10">10</option>
+                <option [ngValue]="25">25</option>
+                <option [ngValue]="50">50</option>
+              </select>
+            </div>
+
+            <div class="paginator-nav">
+              <span class="paginator-range">
+                {{ pageIndex * pageSize + 1 }}–{{ min((pageIndex + 1) * pageSize, totalElements) }} of {{ totalElements }}
+              </span>
+              <button mat-icon-button (click)="onPrevPage()" [disabled]="pageIndex === 0">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+              <button mat-icon-button (click)="onNextPage()" [disabled]="(pageIndex + 1) * pageSize >= totalElements">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </div>
+          </div>
         }
       </mat-card-content>
     </mat-card>

@@ -37,20 +37,25 @@ export class AccountPaymentsComponent implements OnInit {
   customerId: number = 0;
   accountNumber: number = 0;
 
+  // Pagination state
+  totalElements = 0;
+  pageSize = 10;
+  pageIndex = 0;
+
   // Month/year filter
   selectedMonth: number;
   selectedYear: number;
 
   months = [
-    { value: 1, label: 'January' },
-    { value: 2, label: 'February' },
-    { value: 3, label: 'March' },
-    { value: 4, label: 'April' },
-    { value: 5, label: 'May' },
-    { value: 6, label: 'June' },
-    { value: 7, label: 'July' },
-    { value: 8, label: 'August' },
-    { value: 9, label: 'September' },
+    { value: 1,  label: 'January' },
+    { value: 2,  label: 'February' },
+    { value: 3,  label: 'March' },
+    { value: 4,  label: 'April' },
+    { value: 5,  label: 'May' },
+    { value: 6,  label: 'June' },
+    { value: 7,  label: 'July' },
+    { value: 8,  label: 'August' },
+    { value: 9,  label: 'September' },
     { value: 10, label: 'October' },
     { value: 11, label: 'November' },
     { value: 12, label: 'December' }
@@ -80,30 +85,75 @@ export class AccountPaymentsComponent implements OnInit {
     this.loadPayments();
   }
 
+  // -------------------------------------------------------------------------
+  // Data loading
+  // -------------------------------------------------------------------------
+
+  /** Called by the Load button — resets to page 0 when the filter changes. */
   loadPayments(): void {
+    this.pageIndex = 0;
+    this.loadPage();
+  }
+
+  loadPage(): void {
     this.loading = true;
     this.error = '';
 
     const from = new Date(Date.UTC(this.selectedYear, this.selectedMonth - 1, 1));
-    const to = new Date(Date.UTC(this.selectedYear, this.selectedMonth, 0, 23, 59, 59));
+    const to   = new Date(Date.UTC(this.selectedYear, this.selectedMonth, 0, 23, 59, 59));
 
-    this.reportService.getPaymentsByAccount(
+    this.reportService.getAccountPayments(
       this.accountNumber,
       from.toISOString(),
-      to.toISOString()
+      to.toISOString(),
+      this.pageIndex,
+      this.pageSize
     ).subscribe({
-      next: (data) => {
-        this.payments = data;
-        this.loading = false;
+      next: (page) => {
+        this.payments      = page.content;
+        this.totalElements = page.totalElements;
+        this.loading       = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.error = err.error?.message || 'Failed to load payments';
+        this.error   = err.error?.message || 'Failed to load payments';
         this.loading = false;
         this.cdr.detectChanges();
       }
     });
   }
+
+  // -------------------------------------------------------------------------
+  // Pagination
+  // -------------------------------------------------------------------------
+
+  onPageSizeChange(newSize: number): void {
+    this.pageSize  = newSize;
+    this.pageIndex = 0;
+    this.loadPage();
+  }
+
+  onPrevPage(): void {
+    if (this.pageIndex > 0) {
+      this.pageIndex--;
+      this.loadPage();
+    }
+  }
+
+  onNextPage(): void {
+    if ((this.pageIndex + 1) * this.pageSize < this.totalElements) {
+      this.pageIndex++;
+      this.loadPage();
+    }
+  }
+
+  min(a: number, b: number): number {
+    return Math.min(a, b);
+  }
+
+  // -------------------------------------------------------------------------
+  // Navigation
+  // -------------------------------------------------------------------------
 
   goBack(): void {
     this.router.navigate(['/customers', this.customerId]);

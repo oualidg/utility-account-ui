@@ -1,7 +1,11 @@
 <mat-sidenav-container class="shell-container">
 
-  <mat-sidenav mode="side" opened class="shell-sidenav">
-    <div class="shell-logo" routerLink="/home">
+  <mat-sidenav #sidenav
+               [mode]="isMobile ? 'over' : 'side'"
+               [opened]="!isMobile"
+               class="shell-sidenav">
+
+    <div class="shell-logo" routerLink="/home" (click)="onNavItemClick()">
       <mat-icon>bolt</mat-icon>
       <span>Utility Account</span>
     </div>
@@ -11,7 +15,8 @@
         @if (!item.adminOnly || authService.isAdmin()) {
           <a mat-list-item
              [routerLink]="item.route"
-             routerLinkActive="active-link">
+             routerLinkActive="active-link"
+             (click)="onNavItemClick()">
             <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
             <span matListItemTitle>{{ item.label }}</span>
           </a>
@@ -38,9 +43,21 @@
   </mat-sidenav>
 
   <mat-sidenav-content class="shell-content">
+
+    <!-- Mobile toolbar — hamburger + app title -->
+    @if (isMobile) {
+      <mat-toolbar class="shell-toolbar">
+        <button mat-icon-button (click)="sidenav.toggle()" class="menu-button">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span class="shell-toolbar-title">Utility Account</span>
+      </mat-toolbar>
+    }
+
     <div class="shell-page">
       <router-outlet />
     </div>
+
   </mat-sidenav-content>
 
 </mat-sidenav-container>

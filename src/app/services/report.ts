@@ -57,7 +57,7 @@ export class ReportService {
   getSummary(from?: string, to?: string): Observable<ReportSummary> {
     let params = new HttpParams();
     if (from) params = params.set('from', from);
-    if (to) params = params.set('to', to);
+    if (to)   params = params.set('to', to);
     return this.http.get<ReportSummary>(`${this.baseUrl}/summary`, { params });
   }
 
@@ -68,14 +68,14 @@ export class ReportService {
   getProviderSummary(providerCode: string, from?: string, to?: string): Observable<ProviderSummary> {
     let params = new HttpParams();
     if (from) params = params.set('from', from);
-    if (to) params = params.set('to', to);
+    if (to)   params = params.set('to', to);
     return this.http.get<ProviderSummary>(
       `${this.baseUrl}/providers/${providerCode}/summary`, { params }
     );
   }
 
   /**
-   * Search payments by account number within a provider and date range.
+   * Search payments within a provider and date range, paginated.
    * Used by the provider detail page search box.
    */
   searchProviderPayments(
@@ -83,36 +83,51 @@ export class ReportService {
     accountNumber?: number,
     receiptFragment?: string,
     from?: string,
-    to?: string
-  ): Observable<PaymentRecord[]> {
-    let params = new HttpParams().set('providerCode', providerCode);
-    if (accountNumber) params = params.set('accountNumber', accountNumber);
+    to?: string,
+    page = 0,
+    size = 10
+  ): Observable<Page<PaymentRecord>> {
+    let params = new HttpParams()
+      .set('providerCode', providerCode)
+      .set('page', page)
+      .set('size', size);
+    if (accountNumber)   params = params.set('accountNumber', accountNumber);
     if (receiptFragment) params = params.set('receiptNumber', receiptFragment);
-    if (from) params = params.set('from', from);
-    if (to) params = params.set('to', to);
-    return this.http.get<PaymentRecord[]>(`${this.baseUrl}/payments`, { params });
+    if (from)            params = params.set('from', from);
+    if (to)              params = params.set('to', to);
+    return this.http.get<Page<PaymentRecord>>(`${this.baseUrl}/payments`, { params });
   }
 
   /**
    * Full provider reconciliation — all payments for the period.
-   * Used exclusively for CSV export.
+   * Used exclusively for CSV export — intentionally unbounded.
    */
   getReconciliation(providerCode: string, from?: string, to?: string): Observable<ProviderReconciliation> {
     let params = new HttpParams();
     if (from) params = params.set('from', from);
-    if (to) params = params.set('to', to);
+    if (to)   params = params.set('to', to);
     return this.http.get<ProviderReconciliation>(
       `${this.baseUrl}/providers/${providerCode}/reconciliation`, { params }
     );
   }
 
   /**
-   * Payment history for a specific account — used by account-payments component.
+   * Paginated payment history for a specific account.
+   * Used by the account-payments component.
    */
-  getPaymentsByAccount(accountNumber: number, from?: string, to?: string): Observable<PaymentRecord[]> {
-    let params = new HttpParams().set('accountNumber', accountNumber);
+  getAccountPayments(
+    accountNumber: number,
+    from?: string,
+    to?: string,
+    page = 0,
+    size = 10
+  ): Observable<Page<PaymentRecord>> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
     if (from) params = params.set('from', from);
-    if (to) params = params.set('to', to);
-    return this.http.get<PaymentRecord[]>(`${this.baseUrl}/payments`, { params });
+    if (to)   params = params.set('to', to);
+    params = params.set('accountNumber', accountNumber);
+    return this.http.get<Page<PaymentRecord>>(`${this.baseUrl}/payments`, { params });
   }
 }
